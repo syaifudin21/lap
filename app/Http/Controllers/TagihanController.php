@@ -24,7 +24,7 @@ class TagihanController extends Controller
         $tagihan['items'] = '[["LENOVO IdeaCentre C320 444 All-in-One - White","500","1"]]';
         $tagihan['status'] = 'Belum Lunas';
         $tagihan->save();
-        $tagihan['no_trx'] = $this->trx($tagihan->id);
+        $tagihan['trxId'] = $this->trx($tagihan->id);
         $tagihan->save();
 
         if($tagihan){
@@ -51,14 +51,14 @@ class TagihanController extends Controller
     }
     public function lunasi()
     {
-        if(!isset($_GET['noTrx'])){
+        if(!isset($_GET['trxId'])){
             return back()
             ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
         }else{
-            $trx = $_GET['noTrx'];
-            $tagihan = Tagihan::where('no_trx',$trx)->first();
+            $trx = $_GET['trxId'];
+            $tagihan = Tagihan::where('trxId',$trx)->first();
 
-            $parameter['trxId'] = $tagihan->no_trx.rand(1,100);
+            $parameter['trxId'] = $tagihan->trxId.rand(1,100);
             $parameter['terminalId'] = env('LA_TERMINAL_ID');
             $parameter['userKey'] = env('LA_USER_KEY');
             $parameter['password'] = env('LA_PASSWORD');
@@ -68,17 +68,115 @@ class TagihanController extends Controller
             $parameter['items'] = $tagihan->items;
             $parameter['msisdn'] = $tagihan->nomor;
             $parameter['failedUrl'] = route('error');
-            dd($parameter);
 
             $token = $this->send('https://payment.linkaja.id/linkaja-api/api/payment', $parameter);
 
             return redirect(url('https://payment.linkaja.id/checkout/payment?Message=').$token['pgpToken']);
 
-            
+            // dd($result);
+        }
+    }
+    public function enabledMandat()
+    {
+        if(!isset($_GET['trxId'])){
+            return back()
+            ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
+        }else{
+            $trx = $_GET['trxId'];
+            $tagihan = Tagihan::where('trxId',$trx)->first();
+
+            $parameter['trxId'] = $tagihan->trxId.rand(1,100);
+            $parameter['terminalId'] = env('LA_TERMINAL_ID');
+            $parameter['userKey'] = env('LA_USER_KEY');
+            $parameter['password'] = env('LA_PASSWORD');
+            $parameter['signature'] = env('LA_SIGNKEY');
+            $parameter['total'] = $tagihan->tagihan;
+            $parameter['successUrl'] = route('success');
+            $parameter['items'] = $tagihan->items;
+            $parameter['msisdn'] = $tagihan->nomor;
+            $parameter['failedUrl'] = route('error');
+
+            $token = $this->send('https://payment.linkaja.id/linkaja-api/api/payment', $parameter);
+
+            return redirect(url('https://payment.linkaja.id/checkout/payment?Message=').$token['pgpToken']);
 
             // dd($result);
         }
     }
 
+    public function status()
+    {
+        $parameter['terminalId'] = env('LA_TERMINAL_ID');
+        $parameter['userKey'] = env('LA_USER_KEY');
+        $parameter['passKey'] = env('LA_PASSWORD');
+        $parameter['signKey'] = env('LA_SIGNKEY');
+        $parameter['refNum'] = $_GET['refNum'];
+
+        $status = $this->send('https://payment.linkaja.id/linkaja-api/api/check/customer/transaction', $parameter);
+        dd($status);
+    }
+    public function reversal()
+    {
+        $parameter['terminalId'] = env('LA_TERMINAL_ID');
+        $parameter['userKey'] = env('LA_USER_KEY');
+        $parameter['passKey'] = env('LA_PASSWORD');
+        $parameter['signKey'] = env('LA_SIGNKEY');
+        $parameter['refNum'] = $_GET['refNum'];
+        
+        $status = $this->send('https://payment.linkaja.id/tcash-api/api/rev/customer/transaction', $parameter);
+        dd($status);
+    }
+
+    public function enabled()
+    {
+        if(!isset($_GET['trxId'])){
+            return back()
+            ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
+        }else{
+            $trx = $_GET['trxId'];
+            $tagihan = Tagihan::where('trxId',$trx)->first();
+
+            $parameter['terminalId'] = env('LA_TERMINAL_ID');
+            $parameter['userKey'] = env('LA_USER_KEY');
+            $parameter['password'] = env('LA_PASSWORD');
+            $parameter['signKey'] = env('LA_SIGNKEY');
+            $parameter['payerRefnum'] = env('LA_PAYER_REFNUM');
+            $parameter['msisdn'] = $tagihan->nomor;
+            
+            $parameter['refNum'] = $_GET['refNum'];
+            $parameter['trxId'] = $_GET['trxId'];
+            $parameter['successUrl'] = route('success');
+            $parameter['failedUrl'] = route('error');
+
+            $status = $this->send('https://payment.linkaja.id/linkaja-api/api/check/customer/transaction', $parameter);
+            dd($status);
+        }
+    }
+    public function disabled()
+    {
+        if(!isset($_GET['trxId'])){
+            return back()
+            ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
+        }else{
+            $trx = $_GET['trxId'];
+            $tagihan = Tagihan::where('trxId',$trx)->first();
+            
+            $parameter['terminalId'] = env('LA_TERMINAL_ID');
+            $parameter['userKey'] = env('LA_USER_KEY');
+            $parameter['password'] = env('LA_PASSWORD');
+            $parameter['signature'] = env('LA_SIGNKEY');
+            $parameter['payerRefnum'] = env('LA_PAYER_REFNUM');
+            $parameter['msisdn'] = $tagihan->nomor;
+            $parameter['msisdn'] = $tagihan->mandateId;
+            
+            $parameter['refNum'] = $_GET['refNum'];
+            $parameter['trxId'] = $_GET['trxId'];
+            $parameter['successUrl'] = route('success');
+            $parameter['failedUrl'] = route('error');
+
+            $status = $this->send('https://payment.linkaja.id/linkaja-api/api/direct-debit/cancel', $parameter);
+            dd($status);
+        }
+    }
 
 }

@@ -58,8 +58,17 @@
         <li class="list-group-item d-flex justify-content-between lh-condensed">
           <div>
             <h6 class="my-0">{{$tagihan->nama}}</h6>
-            <small class="text-muted">{{$tagihan->no_trx}} 
-              <div class="btn-group"><a href="{{route('tagihan.lunasi').'?noTrx='.$tagihan->no_trx}}" class="btn btn-primary btn-sm">Lunasi</a></div>
+            <small class="text-muted">{{$tagihan->trxId}} 
+              <div class="btn-group">
+                <a href="{{route('tagihan.lunasi').'?trxId='.$tagihan->trxId}}" class="btn btn-primary btn-sm">Lunasi</a>
+                <a href="{{route('tagihan.enabled').'?trxId='.$tagihan->trxId}}" class="btn btn-primary btn-sm">Enabled</a>
+                <a href="{{route('tagihan.disabled').'?trxId='.$tagihan->trxId}}" class="btn btn-primary btn-sm">Disabled</a>
+                
+                @if ($tagihan->refNum != NULL)
+                  <a href="{{route('tagihan.status').'?refNum='.$tagihan->refNum}}" class="btn btn-info btn-sm">Cek Status</a>
+                  <a href="{{route('tagihan.reversal').'?refNum='.$tagihan->refNum}}" class="btn btn-warning btn-sm">Reversal</a>
+                @endif
+              </div>
             </small>
           </div>
           <span class="text-muted">{{$tagihan->tagihan}}</span>
@@ -106,9 +115,9 @@
   <footer class="my-5 pt-5 text-muted text-center text-small">
     <p class="mb-1">&copy; 2017-2019 Company Name</p>
     <ul class="list-inline">
-      <li class="list-inline-item"><a href="#">Privacy</a></li>
+      {{-- <li class="list-inline-item"><a href="#">Privacy</a></li>
       <li class="list-inline-item"><a href="#">Terms</a></li>
-      <li class="list-inline-item"><a href="#">Support</a></li>
+      <li class="list-inline-item"><a href="#">Support</a></li> --}}
     </ul>
   </footer>
 </div>

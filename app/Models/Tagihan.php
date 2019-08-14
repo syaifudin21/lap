@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Tagihan extends Model
 {
     protected $fillable = [
-        'mandat','no_trx','nomor','nama','items','tagihan', 'status'
+        'mandateId','trxId','nomor','nama','items','tagihan', 'status','refNum','src','pgpToken'
     ];
 
     

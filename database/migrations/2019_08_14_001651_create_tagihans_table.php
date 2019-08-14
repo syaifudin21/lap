@@ -15,8 +15,11 @@ class CreateTagihansTable extends Migration
     {
         Schema::create('tagihans', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('no_trx')->nullable();
-            $table->string('mandat')->nullable();
+            $table->string('trxId')->nullable();
+            $table->string('mandateId')->nullable();
+            $table->string('pgpToken')->nullable();
+            $table->string('refNum')->nullable();
+            $table->string('src')->nullable();
             $table->string('nomor');
             $table->string('nama');
             $table->string('items');
