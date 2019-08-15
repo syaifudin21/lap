@@ -58,12 +58,12 @@
         <li class="list-group-item d-flex justify-content-between lh-condensed">
           <div>
             <h6 class="my-0">{{$tagihan->nama}}</h6>
-            <small class="text-muted">{{$tagihan->trxId}} - {{$tagihan->nomor}}
+            <small class="text-muted">{{$tagihan->trxId}} - {{$tagihan->nomor}} - {{$tagihan->refNum}}
               <div class="btn-group">
                 <a href="{{route('tagihan.lunasi').'?trxId='.$tagihan->trxId}}" class="btn btn-primary btn-sm">Lunasi</a>
                 @if ($tagihan->refNum != NULL)
-                  <a href="{{route('tagihan.enabled').'?trxId='.$tagihan->trxId}}" class="btn btn-info btn-sm">Enabled</a>
-                  <a href="{{route('tagihan.disabled').'?trxId='.$tagihan->trxId}}" class="btn btn-danger btn-sm">Disabled</a>
+                  <a href="{{route('tagihan.enabled').'?refNum='.$tagihan->refNum}}" class="btn btn-success btn-sm">Enabled</a>
+                  <a href="{{route('tagihan.disabled').'?refNum='.$tagihan->refNum}}" class="btn btn-danger btn-sm">Disabled</a>
                 
                   <a href="{{route('tagihan.status').'?refNum='.$tagihan->refNum}}" class="btn btn-info btn-sm">Cek Status</a>
                   <a href="{{route('tagihan.reversal').'?refNum='.$tagihan->refNum}}" class="btn btn-warning btn-sm">Reversal</a>

@@ -38,7 +38,6 @@ class TagihanController extends Controller
     }
     public function send($target, $parameter = NULL, $method = 'POST')
     {
-        $target = 'https://payment.linkaja.id/linkaja-api/api/payment';
         $content = array('http' =>
                             array(
                                 'method'  => $method,
@@ -46,7 +45,9 @@ class TagihanController extends Controller
                                 'content' => http_build_query($parameter)
                             )
                         );
-        $result = file_get_contents($target, false, stream_context_create($content));
+        $var = stream_context_create($content);
+        // dd($var);
+        $result = file_get_contents($target, false, $var);
         return json_decode($result, TRUE);
     }
     public function lunasi()
@@ -109,9 +110,9 @@ class TagihanController extends Controller
         $parameter['passKey'] = env('LA_PASSWORD');
         $parameter['signKey'] = env('LA_SIGNKEY');
         $parameter['refNum'] = $_GET['refNum'];
-
         $status = $this->send('https://payment.linkaja.id/linkaja-api/api/check/customer/transaction', $parameter);
         dd($status);
+
     }
     public function reversal()
     {
@@ -127,37 +128,39 @@ class TagihanController extends Controller
 
     public function enabled()
     {
-        if(!isset($_GET['trxId'])){
+        if(!isset($_GET['refNum'])){
             return back()
             ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
         }else{
-            $trx = $_GET['trxId'];
-            $tagihan = Tagihan::where('trxId',$trx)->first();
-
+            $refNum = $_GET['refNum'];
+            $tagihan = Tagihan::where('refNum',$refNum)->first();
+            // dd($tagihan);
             $parameter['terminalId'] = env('LA_TERMINAL_ID');
             $parameter['userKey'] = env('LA_USER_KEY');
             $parameter['password'] = env('LA_PASSWORD');
             $parameter['signKey'] = env('LA_SIGNKEY');
-            $parameter['payerRefnum'] = env('LA_PAYER_REFNUM');
-            $parameter['msisdn'] = $tagihan->nomor;
+            $parameter['payerRefnum'] = $tagihan->refNum;
+            $parameter['Msisdn'] = $tagihan->nomor;
             
-            $parameter['refNum'] = $_GET['refNum'];
-            $parameter['trxId'] = $_GET['trxId'];
+            $parameter['refNum'] = $refNum;
+            $parameter['trxId'] = $tagihan->trxId;
             $parameter['successUrl'] = route('success');
             $parameter['failedUrl'] = route('error');
-
-            $status = $this->send('https://payment.linkaja.id/linkaja-api/api/check/customer/transaction', $parameter);
+            $parameter['default_language'] = 0;
+            $parameter['default_template'] = 0;
+            dd($parameter);
+            $status = $this->send('https://payment.linkaja.id/linkaja-api/api/direct-debit/enable', $parameter);
             dd($status);
         }
     }
     public function disabled()
     {
-        if(!isset($_GET['trxId'])){
+        if(!isset($_GET['refNum'])){
             return back()
             ->with(['alert'=> "'title':'Gagal Menyimpan','text':'No Transaksi tidak ada, periksa kembali data inputan', 'icon':'error'"]);
         }else{
-            $trx = $_GET['trxId'];
-            $tagihan = Tagihan::where('trxId',$trx)->first();
+            $refNum = $_GET['refNum'];
+            $tagihan = Tagihan::where('refNum',$refNum)->first();
             
             $parameter['terminalId'] = env('LA_TERMINAL_ID');
             $parameter['userKey'] = env('LA_USER_KEY');
@@ -166,8 +169,8 @@ class TagihanController extends Controller
             $parameter['payerRefnum'] = env('LA_PAYER_REFNUM');
             $parameter['msisdn'] = $tagihan->nomor;
             
-            $parameter['refNum'] = $_GET['refNum'];
-            $parameter['trxId'] = $_GET['trxId'];
+            $parameter['refNum'] = $tagihan->refNum;
+            $parameter['trxId'] = $tagihan->trxId;
             $parameter['successUrl'] = route('success');
             $parameter['failedUrl'] = route('error');
 
