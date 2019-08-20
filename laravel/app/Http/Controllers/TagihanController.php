@@ -148,7 +148,6 @@ class TagihanController extends Controller
             $parameter['failedUrl'] = route('error');
             $parameter['default_language'] = 0;
             $parameter['default_template'] = 0;
-            dd($parameter);
             $status = $this->send('https://payment.linkaja.id/linkaja-api/api/direct-debit/enable', $parameter);
             dd($status);
         }
